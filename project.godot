@@ -8,10 +8,44 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Node2D",
+"class": "Ball",
+"language": "GDScript",
+"path": "res://Ball/Ball.gd"
+}, {
+"base": "Resource",
+"class": "BoundBox",
+"language": "GDScript",
+"path": "res://Misc/BoundBox.gd"
+}, {
+"base": "Resource",
+"class": "Collisions",
+"language": "GDScript",
+"path": "res://Misc/Collisions.gd"
+}, {
+"base": "Node2D",
+"class": "Paddle",
+"language": "GDScript",
+"path": "res://Paddle/Paddle.gd"
+}, {
+"base": "Paddle",
+"class": "PlayerPaddle",
+"language": "GDScript",
+"path": "res://Paddle/PlayerPaddle.gd"
+} ]
+_global_script_class_icons={
+"Ball": "",
+"BoundBox": "",
+"Collisions": "",
+"Paddle": "",
+"PlayerPaddle": ""
+}
+
 [application]
 
 config/name="Pong-Basic"
-run/main_scene="res://pong-03/Node2D.tscn"
+run/main_scene="res://PongGame.tscn"
 
 [display]
 
