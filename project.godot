@@ -9,6 +9,11 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Paddle",
+"class": "AiPaddle",
+"language": "GDScript",
+"path": "res://Paddle/AiPaddle.gd"
+}, {
 "base": "Node2D",
 "class": "Ball",
 "language": "GDScript",
@@ -35,6 +40,7 @@ _global_script_classes=[ {
 "path": "res://Paddle/PlayerPaddle.gd"
 } ]
 _global_script_class_icons={
+"AiPaddle": "",
 "Ball": "",
 "BoundBox": "",
 "Collisions": "",

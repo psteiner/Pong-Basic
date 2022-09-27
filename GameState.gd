@@ -11,17 +11,13 @@ onready var screenBox: BoundBox = BoundBox.new(screen)
 
 onready var ball: Ball = Ball.new(screenBox.getCenter())
 onready var playerPaddle: PlayerPaddle = PlayerPaddle.new(screenBox)
+onready var aiPaddle: AiPaddle = AiPaddle.new(screenBox)
 
 # ai paddle
 var paddlePadding = 10.0
 var paddleSize = Vector2(10.0,100.0)
 var halfPaddleHeight = paddleSize.y/2.0
 var paddleColor: Color = Color.white
-onready var aiPosition: Vector2 = Vector2(
-  screenBox.getSize().x - (paddlePadding + paddleSize.x), 
-  screenBox.getHalfHeight() - halfPaddleHeight
-)
-onready var aiRectangle: Rect2 = Rect2(aiPosition, paddleSize)
 
 # string variable
 var stringPosition: Vector2
@@ -57,6 +53,7 @@ var stringValue: String = "Start a game by pressing the spacebar"
 func _ready() -> void:
   add_child(ball)
   add_child(playerPaddle)
+  add_child(aiPaddle)
   font.font_data = robotoFile
   font.size = fontSize
   halfWidthFont = font.get_string_size(stringValue).x/2.0
@@ -113,12 +110,15 @@ func _physics_process(delta: float) -> void:
         deltaKeyPress = RESET_DELTA_KEY
     GAME_STATE.PLAY:
       playerPaddle.checkMovement(delta)
+      aiPaddle.checkMovement(delta, ball.getPosition())
+      ball.moveBall(delta)
+      
       change_string("PLAY!!!")
       if(Input.is_key_pressed(KEY_SPACE) and deltaKeyPress > MAX_KEY_TIME):
         currentGameState = GAME_STATE.SERVE
         deltaKeyPress = RESET_DELTA_KEY
       
-      ball.moveBall(delta)
+
       
       if screenBox.isPastLeftBound(ball.getPosition()):
         currentGameState = GAME_STATE.SERVE
@@ -142,30 +142,20 @@ func _physics_process(delta: float) -> void:
       if(Collisions.pointToRectangle(ball.getPosition(), playerPaddle.getRect())):
         ball.inverseXSpeed()
         
-      if(Collisions.pointToRectangle(ball.getPosition(), Rect2(aiPosition, paddleSize))):
+      if(Collisions.pointToRectangle(ball.getPosition(), aiPaddle.getRect())):
         ball.inverseXSpeed()
 
-      
-      if ball.getPosition().y > aiPosition.y + (paddleSize.y/2 + 10):
-        aiPosition.y += 250 * delta
-      if ball.getPosition().y < aiPosition.y + (paddleSize.y/2 - 10):
-        aiPosition.y -= 250 * delta
-      aiPosition.y = clamp(aiPosition.y, 0.0, screenBox.getSize().y - paddleSize.y)
-      aiRectangle = Rect2(aiPosition, paddleSize)
       update()
   
 func _draw() -> void:
-  draw_rect(aiRectangle,paddleColor)
+
   draw_string(font, stringPosition, stringValue)
   draw_string(font, playerScorePosition, playerScoreText)
   draw_string(font, aiScorePosition, aiScoreText)
 
 func set_starting_position() -> void:
-  aiPosition = Vector2(screenBox.getSize().x - (paddlePadding + paddleSize.x),
-  screenBox.getHalfHeight() - halfPaddleHeight)
-  aiRectangle = Rect2(aiPosition, paddleSize)
-
   playerPaddle.resetPosition()
+  aiPaddle.resetPosition()
   ball.resetBall(isPlayerServe)
 
 func change_string(newStringValue) -> void:
