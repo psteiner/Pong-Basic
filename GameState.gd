@@ -13,16 +13,8 @@ onready var ball: Ball = Ball.new(screenBox.getCenter())
 onready var playerPaddle: PlayerPaddle = PlayerPaddle.new(screenBox)
 onready var aiPaddle: AiPaddle = AiPaddle.new(screenBox)
 
-# ai paddle
-var paddlePadding = 10.0
-var paddleSize = Vector2(10.0,100.0)
-var halfPaddleHeight = paddleSize.y/2.0
-var paddleColor: Color = Color.white
-
 # string variable
 var stringPosition: Vector2
-
-var playerSpeed: float = 200.00
 
 var playerScore: int = 0
 var playerScoreText: String = playerScore as String
@@ -117,8 +109,6 @@ func _physics_process(delta: float) -> void:
       if(Input.is_key_pressed(KEY_SPACE) and deltaKeyPress > MAX_KEY_TIME):
         currentGameState = GAME_STATE.SERVE
         deltaKeyPress = RESET_DELTA_KEY
-      
-
       
       if screenBox.isPastLeftBound(ball.getPosition()):
         currentGameState = GAME_STATE.SERVE

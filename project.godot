@@ -38,6 +38,11 @@ _global_script_classes=[ {
 "class": "PlayerPaddle",
 "language": "GDScript",
 "path": "res://Paddle/PlayerPaddle.gd"
+}, {
+"base": "Node2D",
+"class": "Text",
+"language": "GDScript",
+"path": "res://Misc/Text.gd"
 } ]
 _global_script_class_icons={
 "AiPaddle": "",
@@ -45,7 +50,8 @@ _global_script_class_icons={
 "BoundBox": "",
 "Collisions": "",
 "Paddle": "",
-"PlayerPaddle": ""
+"PlayerPaddle": "",
+"Text": ""
 }
 
 [application]
