@@ -6,7 +6,8 @@ const _CHASE_BUFFER: float = 15.0
 
 func _init(box: BoundBox) -> void:
   _boundBox = box
-  _pos = Vector2(_boundBox.getSize().x -(_padding + _size.x), _boundBox.getHalfHeight() - _halfHeight)
+  _pos = Vector2(_boundBox.getSize().x -(_padding + _size.x), 
+    _boundBox.getHalfHeight() - _halfHeight)
   _resetPos = _pos
   _rect = Rect2(_pos, _size)
 

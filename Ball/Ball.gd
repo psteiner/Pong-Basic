@@ -3,17 +3,16 @@ extends Node2D
 class_name Ball
 
 var _color: Color = Color.white
-var _speed: Vector2 = Vector2(400.0, 0.0)
 var _radius: float = 10.0
-var _resetPos: Vector2
 var _pos: Vector2
+var _resetPos: Vector2
+var _speed: Vector2
 var _resetSpeed: Vector2
-var _playerServe: bool
 
-func _init(startPos: Vector2, playerServe:= true):
+func _init(startPos: Vector2, speed := 400.0):
   _pos = startPos
   _resetPos = startPos
-  _playerServe = playerServe
+  _speed = Vector2(abs(speed), 0.0)
   _resetSpeed = _speed
   
 func _draw() -> void:
@@ -42,3 +41,15 @@ func getTopPoint() -> Vector2:
 
 func getBottomPoint() -> Vector2:
   return Vector2(_pos.x, _pos.y + _radius)
+  
+func isMovingLeft() -> bool:
+  return _speed.x <= 0.0
+
+func isMovingRight() -> bool:
+  return _speed.x >= 0.0
+  
+func isMovingUp() -> bool:
+  return _speed.y <= 0.0
+
+func isMovingDown() -> bool:
+  return _speed.y >= 0.0

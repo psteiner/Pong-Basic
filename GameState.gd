@@ -59,77 +59,85 @@ func _physics_process(delta: float) -> void:
   
   match currentGameState:
     GAME_STATE.MENU:
-      if(isPlayerWin == true):
-        instructionText.updateString("Player Wins! Press spacebar to start a new game")
-      if(isPlayerWin == false):
-        instructionText.updateString("AI Wins! Press spacebar to start a new game")
-      
-      if(Input.is_key_pressed(KEY_SPACE) and deltaKeyPress > MAX_KEY_TIME):
-        currentGameState = GAME_STATE.SERVE
-        deltaKeyPress = RESET_DELTA_KEY
-        playerScoreText.updateString(playerScore as String)
-        aiScoreText.updateString(aiScore as String)
+      checkChangeState(GAME_STATE.SERVE)
         
     GAME_STATE.SERVE:
-      set_starting_position()
-      update()
-      
-      if(MAX_SCORE == playerScore):
-        currentGameState = GAME_STATE.MENU
-        playerScore = 0
-        aiScore = 0
-        isPlayerWin = true
-      if(MAX_SCORE == aiScore):
-        currentGameState = GAME_STATE.MENU
-        playerScore = 0
-        aiScore = 0
-        isPlayerWin = false
-
-      if isPlayerServe:
-        instructionText.updateString("Player Serve: press spacebar to serve")
-      else:
-        instructionText.updateString("AI Serve: press spacebar to serve")
-      
-      if(Input.is_key_pressed(KEY_SPACE) and deltaKeyPress > MAX_KEY_TIME):
-        currentGameState = GAME_STATE.PLAY
-        deltaKeyPress = RESET_DELTA_KEY
-    GAME_STATE.PLAY:
-      playerPaddle.checkMovement(delta)
-      aiPaddle.checkMovement(delta, ball.getPosition())
-      ball.moveBall(delta)
-      
-      instructionText.updateString("PLAY!!!")
-      if(Input.is_key_pressed(KEY_SPACE) and deltaKeyPress > MAX_KEY_TIME):
-        currentGameState = GAME_STATE.SERVE
-        deltaKeyPress = RESET_DELTA_KEY
-      
-      if screenBox.isPastLeftBound(ball.getPosition()):
-        currentGameState = GAME_STATE.SERVE
-        deltaKeyPress = RESET_DELTA_KEY
-        isPlayerServe = true
-        aiScore += 1
-        aiScoreText.updateString(aiScore as String)
-      
-      if screenBox.isPastRightBound(ball.getPosition()):
-        currentGameState = GAME_STATE.SERVE
-        deltaKeyPress = RESET_DELTA_KEY
-        isPlayerServe = false
-        playerScore += 1
-        playerScoreText.updateString(playerScore as String)
- 
-      if screenBox.isPastTopBound(ball.getTopPoint()):
-        ball.inverseYSpeed()
-      if screenBox.isPastBottomBound(ball.getBottomPoint()):
-        ball.inverseYSpeed()
-
-      if(Collisions.pointToRectangle(ball.getPosition(), playerPaddle.getRect())):
-        ball.inverseXSpeed()
-        
-      if(Collisions.pointToRectangle(ball.getPosition(), aiPaddle.getRect())):
-        ball.inverseXSpeed()
+      setStartingPosition()
+      checkWinner()
+      checkChangeState(GAME_STATE.PLAY)
   
-func set_starting_position() -> void:
+    GAME_STATE.PLAY:
+      instructionText.updateString("W = Move Up; S = Move Down")
+      moveObjects(delta)
+      checkCollisions()
+      checkChangeState(GAME_STATE.SERVE)
+
+func moveObjects(delta: float) -> void:
+  playerPaddle.checkMovement(delta)
+  aiPaddle.checkMovement(delta, ball.getPosition())
+  ball.moveBall(delta)
+  
+
+func setStartingPosition() -> void:
   playerPaddle.resetPosition()
   aiPaddle.resetPosition()
   ball.resetBall(isPlayerServe)
+  aiScoreText.updateString(aiScore as String)   
+  playerScoreText.updateString(playerScore as String)
+    
+  if isPlayerServe:
+    instructionText.updateString("Player Serve: press spacebar to serve")
+  else:
+    instructionText.updateString("AI Serve: press spacebar to serve")
 
+func checkChangeState(newState: int) -> void:
+  if spaceBarDelay():
+    currentGameState = newState
+    deltaKeyPress = RESET_DELTA_KEY
+
+func spaceBarDelay() -> bool:
+  return Input.is_key_pressed(KEY_SPACE) and deltaKeyPress > MAX_KEY_TIME
+
+func gamePointPlayer(playerWin: bool) -> void:
+  currentGameState = GAME_STATE.SERVE
+  deltaKeyPress = RESET_DELTA_KEY
+  isPlayerServe = !playerWin
+  
+  playerScore += 1 if playerWin else 0
+  playerScoreText.updateString(playerScore as String)
+  
+  aiScore += 1 if !playerWin else 0
+  aiScoreText.updateString(aiScore as String)   
+
+func checkWinner() -> void:
+  match MAX_SCORE:
+    playerScore:
+      currentGameState = GAME_STATE.MENU
+      playerScore = 0
+      aiScore = 0
+      isPlayerWin = true
+      instructionText.updateString("Player Wins! Press spacebar to start a new game")
+    aiScore:
+      currentGameState = GAME_STATE.MENU
+      playerScore = 0
+      aiScore = 0
+      isPlayerWin = false
+      instructionText.updateString("AI Wins! Press spacebar to start a new game")
+
+func checkCollisions() -> void:
+  if screenBox.isPastLeftBound(ball.getPosition()):
+    gamePointPlayer(false)
+  
+  if screenBox.isPastRightBound(ball.getPosition()):
+    gamePointPlayer(true)
+
+  if screenBox.isPastTopBound(ball.getTopPoint()) and ball.isMovingUp():
+    ball.inverseYSpeed()
+  if screenBox.isPastBottomBound(ball.getBottomPoint()) and ball.isMovingDown():
+    ball.inverseYSpeed()
+
+  if Collisions.pointToRectangle(ball.getPosition(), playerPaddle.getRect()) and ball.isMovingLeft():
+    ball.inverseXSpeed()
+    
+  if Collisions.pointToRectangle(ball.getPosition(), aiPaddle.getRect()) and ball.isMovingRight():
+    ball.inverseXSpeed()
