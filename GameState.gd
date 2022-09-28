@@ -4,6 +4,11 @@ extends Node2D
 enum GAME_STATE {MENU, SERVE, PLAY}
 var isPlayerServe = true
 
+# scoring
+var playerScore: int = 0
+var aiScore: int = 0
+var _SCORE_HEIGHT_PADDING = 50.0
+
 # current state
 var currentGameState = GAME_STATE.MENU
 onready var screen: Rect2 = get_tree().get_root().get_visible_rect()
@@ -12,52 +17,41 @@ onready var screenBox: BoundBox = BoundBox.new(screen)
 onready var ball: Ball = Ball.new(screenBox.getCenter())
 onready var playerPaddle: PlayerPaddle = PlayerPaddle.new(screenBox)
 onready var aiPaddle: AiPaddle = AiPaddle.new(screenBox)
+onready var instructionText: Text = Text.new(
+  "Start a game by pressing the space bar", 
+  Vector2(screenBox.getSize().x / 2.0, 0.0))
+  
+onready var playerScoreText: Text = Text.new(
+  playerScore as String,
+  Vector2(screenBox.getSize().x/4.0, _SCORE_HEIGHT_PADDING)
+ )
+onready var aiScoreText: Text = Text.new(
+  aiScore as String,
+  Vector2(screenBox.getSize().x - screenBox.getSize().x/4.0, _SCORE_HEIGHT_PADDING)
+ )
 
-# string variable
-var stringPosition: Vector2
 
-var playerScore: int = 0
-var playerScoreText: String = playerScore as String
 var playerTextHalfWidth: float
 var playerScorePosition: Vector2
 
-var aiScore: int = 0
-var aiScoreText: String = aiScore as String
 var aiTextHalfWidth: float
 var aiScorePosition: Vector2
-
-const MAX_SCORE: int = 3
-var isPlayerWin
 
 # delta key
 const RESET_DELTA_KEY: float = 0.0
 const MAX_KEY_TIME: float = 0.3
 var deltaKeyPress: float = RESET_DELTA_KEY
 
-# font variable
-var font: DynamicFont = DynamicFont.new()
-var robotoFile: DynamicFontData = load("Roboto-Light.ttf")
-var fontSize: int = 36
-var halfWidthFont: float
-var heightFont: float
-var stringValue: String = "Start a game by pressing the spacebar"
+const MAX_SCORE: int = 3
+var isPlayerWin
 
 func _ready() -> void:
   add_child(ball)
   add_child(playerPaddle)
   add_child(aiPaddle)
-  font.font_data = robotoFile
-  font.size = fontSize
-  halfWidthFont = font.get_string_size(stringValue).x/2.0
-  heightFont = font.get_height()
-  stringPosition = Vector2(screenBox.getHalfWidth() - halfWidthFont, heightFont)
-  
-  playerTextHalfWidth = font.get_string_size(playerScoreText).x/2.0
-  playerScorePosition = Vector2(screenBox.getHalfWidth() - (screenBox.getHalfWidth()/2.0) - 
-    playerTextHalfWidth, heightFont + 50)
-  aiTextHalfWidth = font.get_string_size(aiScoreText).x/2.0
-  aiScorePosition = Vector2(screenBox.getHalfWidth() + (screenBox.getHalfWidth()/2.0) - 
-    aiTextHalfWidth, heightFont + 50)
+  add_child(instructionText)
+  add_child(playerScoreText)
+  add_child(aiScoreText)
   
 func _physics_process(delta: float) -> void:
   
@@ -66,15 +60,16 @@ func _physics_process(delta: float) -> void:
   match currentGameState:
     GAME_STATE.MENU:
       if(isPlayerWin == true):
-        change_string("Player Wins! Press spacebar to start a new game")
+        instructionText.updateString("Player Wins! Press spacebar to start a new game")
       if(isPlayerWin == false):
-        change_string("AI Wins! Press spacebar to start a new game")
+        instructionText.updateString("AI Wins! Press spacebar to start a new game")
       
       if(Input.is_key_pressed(KEY_SPACE) and deltaKeyPress > MAX_KEY_TIME):
         currentGameState = GAME_STATE.SERVE
         deltaKeyPress = RESET_DELTA_KEY
-        playerScoreText = playerScore as String
-        aiScoreText = aiScore as String
+        playerScoreText.updateString(playerScore as String)
+        aiScoreText.updateString(aiScore as String)
+        
     GAME_STATE.SERVE:
       set_starting_position()
       update()
@@ -91,11 +86,9 @@ func _physics_process(delta: float) -> void:
         isPlayerWin = false
 
       if isPlayerServe:
-#        ball.resetBall(isPlayerServe)
-        change_string("Player Serve: press spacebar to serve")
+        instructionText.updateString("Player Serve: press spacebar to serve")
       else:
-#        ball.resetBall(isPlayerServe)
-        change_string("AI Serve: press spacebar to serve")
+        instructionText.updateString("AI Serve: press spacebar to serve")
       
       if(Input.is_key_pressed(KEY_SPACE) and deltaKeyPress > MAX_KEY_TIME):
         currentGameState = GAME_STATE.PLAY
@@ -105,7 +98,7 @@ func _physics_process(delta: float) -> void:
       aiPaddle.checkMovement(delta, ball.getPosition())
       ball.moveBall(delta)
       
-      change_string("PLAY!!!")
+      instructionText.updateString("PLAY!!!")
       if(Input.is_key_pressed(KEY_SPACE) and deltaKeyPress > MAX_KEY_TIME):
         currentGameState = GAME_STATE.SERVE
         deltaKeyPress = RESET_DELTA_KEY
@@ -115,14 +108,14 @@ func _physics_process(delta: float) -> void:
         deltaKeyPress = RESET_DELTA_KEY
         isPlayerServe = true
         aiScore += 1
-        aiScoreText = aiScore as String
+        aiScoreText.updateString(aiScore as String)
       
       if screenBox.isPastRightBound(ball.getPosition()):
         currentGameState = GAME_STATE.SERVE
         deltaKeyPress = RESET_DELTA_KEY
         isPlayerServe = false
         playerScore += 1
-        playerScoreText = playerScore as String
+        playerScoreText.updateString(playerScore as String)
  
       if screenBox.isPastTopBound(ball.getTopPoint()):
         ball.inverseYSpeed()
@@ -134,22 +127,9 @@ func _physics_process(delta: float) -> void:
         
       if(Collisions.pointToRectangle(ball.getPosition(), aiPaddle.getRect())):
         ball.inverseXSpeed()
-
-      update()
   
-func _draw() -> void:
-
-  draw_string(font, stringPosition, stringValue)
-  draw_string(font, playerScorePosition, playerScoreText)
-  draw_string(font, aiScorePosition, aiScoreText)
-
 func set_starting_position() -> void:
   playerPaddle.resetPosition()
   aiPaddle.resetPosition()
   ball.resetBall(isPlayerServe)
 
-func change_string(newStringValue) -> void:
-  stringValue = newStringValue
-  halfWidthFont = font.get_string_size(stringValue).x/2.0
-  stringPosition = Vector2(screenBox.getHalfWidth() - halfWidthFont, heightFont)
-  update() 
