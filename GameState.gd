@@ -137,7 +137,7 @@ func checkCollisions() -> void:
     ball.inverseYSpeed()
 
   if Collisions.pointToRectangle(ball.getPosition(), playerPaddle.getRect()) and ball.isMovingLeft():
-    ball.inverseXSpeed()
+    playerPaddle.changeBallDirection(ball)
     
   if Collisions.pointToRectangle(ball.getPosition(), aiPaddle.getRect()) and ball.isMovingRight():
-    ball.inverseXSpeed()
+    aiPaddle.changeBallDirection(ball)

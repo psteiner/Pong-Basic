@@ -15,6 +15,9 @@ var _pos: Vector2
 var _resetPos: Vector2
 var _boundBox: BoundBox
 
+var _maxMagnitude: float = 3.0
+var _maxRotation: float = 75.0
+
 func _draw() -> void:
   draw_rect(_rect, _color)
 
@@ -41,3 +44,13 @@ func moveUp(delta) -> void:
 # override in subclasses
 func moveDown(delta) -> void:
   assert(false, "Must override method moveDown()")
+
+func changeBallDirection(ball: Ball) -> void:
+  var ballY = ball.getPosition().y
+  var magnitude: float = Math.pointConversion(ballY, _pos.y, _pos.y + _size.y, _maxMagnitude, -_maxMagnitude)
+  var degree: float = Math.pointConversion(ballY, _pos.y, _pos.y + _size.y, _maxRotation, -_maxRotation)
+  
+  magnitude = abs(magnitude) if abs(magnitude) >= 1.0 else 1.0
+  
+  ball.changeRotationAndDirection(degree)
+  ball.changeMagnitude(magnitude)

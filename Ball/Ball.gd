@@ -31,7 +31,7 @@ func inverseYSpeed() -> void:
   _speed.y = -_speed.y
   
 func inverseXSpeed() -> void:
-  _speed = Vector2(-_speed.x, rand_range(-400.0,400.0))
+  _speed.x = -_speed.x
         
 func getPosition() -> Vector2:
   return _pos
@@ -53,3 +53,21 @@ func isMovingUp() -> bool:
 
 func isMovingDown() -> bool:
   return _speed.y >= 0.0
+
+func changeMagnitude(scale: float) -> void:
+  _speed = Math.vectorScaling(_speed, scale)
+  
+func changeRotationAndDirection(degree: float) -> void:
+  inverseXSpeed()
+  var leftOrRight: float = 1.0 if isMovingRight() else -1.0
+  
+  # result returned in Cartesion graph system
+  var rotate = Math.vectorRotation(_resetSpeed, degree)
+
+  rotate.y = -rotate.y
+  rotate.x = rotate.x * leftOrRight
+  
+  changeSpeed(rotate)
+
+func changeSpeed(speed: Vector2) -> void:
+  _speed = speed

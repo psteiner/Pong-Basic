@@ -29,6 +29,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Misc/Collisions.gd"
 }, {
+"base": "Resource",
+"class": "Math",
+"language": "GDScript",
+"path": "res://Misc/Math.gd"
+}, {
 "base": "Node2D",
 "class": "Paddle",
 "language": "GDScript",
@@ -49,6 +54,7 @@ _global_script_class_icons={
 "Ball": "",
 "BoundBox": "",
 "Collisions": "",
+"Math": "",
 "Paddle": "",
 "PlayerPaddle": "",
 "Text": ""
