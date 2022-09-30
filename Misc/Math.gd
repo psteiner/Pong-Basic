@@ -28,3 +28,16 @@ static func vectorRotation(original: Vector2, degree: float) -> Vector2:
   # cartesian graph system != Godot Game Engine Graph System
   # caller must convert result
   return result
+
+
+static func primitiveNormalDistributionRandom() -> float:
+  var iterate: int = 6
+  var result: float = 0.0
+  
+  randomize()
+  for i in iterate:
+    result += randf() 
+    
+  print(result / float(iterate))
+    
+  return result / float(iterate)

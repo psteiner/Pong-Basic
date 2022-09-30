@@ -3,6 +3,7 @@ extends Paddle
 class_name AiPaddle
 
 const _CHASE_BUFFER: float = 15.0
+onready var _chasePosition: float = _halfHeight
 
 func _init(box: BoundBox) -> void:
   _boundBox = box
@@ -12,10 +13,10 @@ func _init(box: BoundBox) -> void:
   _rect = Rect2(_pos, _size)
 
 func checkMovement(delta: float, ballPos: Vector2):
-  if ballPos.y <= (_pos.y + _halfHeight) - _CHASE_BUFFER:
+  if ballPos.y <= (_pos.y + _chasePosition) - _CHASE_BUFFER:
     moveUp(delta)
     updatePosition()
-  elif ballPos.y >= (_pos.y + _halfHeight) + _CHASE_BUFFER:
+  elif ballPos.y >= (_pos.y + _chasePosition) + _CHASE_BUFFER:
     moveDown(delta)
     updatePosition()
     
@@ -28,3 +29,15 @@ func moveUp(delta: float) -> void:
 
 func moveDown(delta: float) -> void:
   _pos.y += _speed.y * delta
+
+func changeChasePosition() -> void:
+  var rndDistribution: float = Math.primitiveNormalDistributionRandom()
+  var rndMin: float = 0.0
+  var rndMax: float = 1.0
+  var minChaseSize: float = 0.0
+  var maxChaseSize: float = _size.y
+  
+  _chasePosition = Math.pointConversion(
+    rndDistribution, rndMin, rndMax, minChaseSize, maxChaseSize
+  )
+  
