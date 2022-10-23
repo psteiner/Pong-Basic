@@ -38,11 +38,11 @@ func updatePosition() -> void:
   update()
 
 # override in subclasses
-func moveUp(delta) -> void:
+func moveUp(_delta) -> void:
   assert(false, "Must override method moveUp()")
   
 # override in subclasses
-func moveDown(delta) -> void:
+func moveDown(_delta) -> void:
   assert(false, "Must override method moveDown()")
 
 func changeBallDirection(ball: Ball) -> void:

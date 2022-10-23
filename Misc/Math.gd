@@ -9,7 +9,7 @@ static func pointConversion(pointA: float, originalStart: float, originalEnd: fl
   return ((pointA - originalStart) * (newLength/length)) + newStart
 
 static func vectorScaling(original: Vector2, scale: float) -> Vector2:
-  var result: Vector2
+  var result: Vector2 = Vector2(0.0,0.0)
   
   result.x = original.x * scale
   result.y = original.y * scale
@@ -17,7 +17,7 @@ static func vectorScaling(original: Vector2, scale: float) -> Vector2:
   return result
 
 static func vectorRotation(original: Vector2, degree: float) -> Vector2:
-  var result: Vector2
+  var result: Vector2 = Vector2(0.0,0.0)
   var radian: float = deg2rad(degree)
   var sine: float = sin(radian)
   var cosine: float = cos(radian)

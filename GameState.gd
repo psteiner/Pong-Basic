@@ -1,5 +1,12 @@
 extends Node2D
 
+# sound maker
+var backgroundStream: AudioStreamPlayer = AudioStreamPlayer.new()
+var backgroundManager: BackgroundManager = BackgroundManager.new()
+
+var soundStream: AudioStreamPlayer = AudioStreamPlayer.new()
+var soundManager: SoundManager = SoundManager.new()
+
 # states
 enum GAME_STATE {MENU, SERVE, PLAY}
 var isPlayerServe = true
@@ -46,6 +53,14 @@ const MAX_SCORE: int = 3
 var isPlayerWin
 
 func _ready() -> void:
+  backgroundStream.name = "BackgroundStream"
+  backgroundStream.add_child(backgroundManager)
+  add_child(backgroundStream)
+  
+  soundStream.name = "SoundStream"
+  soundStream.add_child(soundManager)
+  add_child(soundStream)
+  
   add_child(ball)
   add_child(playerPaddle)
   add_child(aiPaddle)
@@ -117,28 +132,37 @@ func checkWinner() -> void:
       aiScore = 0
       isPlayerWin = true
       instructionText.updateString("Player Wins! Press spacebar to start a new game")
+      soundManager.playWinRound()
     aiScore:
       currentGameState = GAME_STATE.MENU
       playerScore = 0
       aiScore = 0
       isPlayerWin = false
       instructionText.updateString("AI Wins! Press spacebar to start a new game")
+      soundManager.playLoseRound()
 
 func checkCollisions() -> void:
   if screenBox.isPastLeftBound(ball.getPosition()):
     gamePointPlayer(false)
+    soundManager.playLosePoint()
   
   if screenBox.isPastRightBound(ball.getPosition()):
     gamePointPlayer(true)
+    soundManager.playWinPoint()
 
   if screenBox.isPastTopBound(ball.getTopPoint()) and ball.isMovingUp():
     ball.inverseYSpeed()
+    soundManager.playBounce()
+    
   if screenBox.isPastBottomBound(ball.getBottomPoint()) and ball.isMovingDown():
     ball.inverseYSpeed()
+    soundManager.playBounce()
 
   if Collisions.pointToRectangle(ball.getPosition(), playerPaddle.getRect()) and ball.isMovingLeft():
     playerPaddle.changeBallDirection(ball)
+    soundManager.playBounce()
     
   if Collisions.pointToRectangle(ball.getPosition(), aiPaddle.getRect()) and ball.isMovingRight():
     aiPaddle.changeBallDirection(ball)
     aiPaddle.changeChasePosition()
+    soundManager.playBounce()
