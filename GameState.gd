@@ -9,12 +9,12 @@ var soundManager: SoundManager = SoundManager.new()
 
 # states
 enum GAME_STATE {MENU, SERVE, PLAY}
-var isPlayerServe = true
+var isPlayerServe: bool = true
 
 # scoring
 var playerScore: int = 0
 var aiScore: int = 0
-var _SCORE_HEIGHT_PADDING = 50.0
+var _SCORE_HEIGHT_PADDING: float = 50.0
 
 # current state
 var currentGameState = GAME_STATE.MENU
@@ -50,7 +50,7 @@ const MAX_KEY_TIME: float = 0.3
 var deltaKeyPress: float = RESET_DELTA_KEY
 
 const MAX_SCORE: int = 3
-var isPlayerWin
+var isPlayerWin: bool
 
 func _ready() -> void:
   backgroundStream.name = "BackgroundStream"
@@ -94,8 +94,8 @@ func moveObjects(delta: float) -> void:
   
 
 func setStartingPosition() -> void:
-  playerPaddle.resetPosition()
   aiPaddle.resetPosition()
+  playerPaddle.resetPosition()
   ball.resetBall(isPlayerServe)
   aiScoreText.updateString(aiScore as String)   
   playerScoreText.updateString(playerScore as String)

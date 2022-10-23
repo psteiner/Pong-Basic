@@ -18,7 +18,7 @@ var losePointLength: float = losePointFile.get_length()
 var losePointName: String = "LosePoint"
 
 var winRoundFile: Resource = preload("res://Music/WinRound.wav")
-var winRoundLength:float = winRoundFile.get_length()
+var winRoundLength: float = winRoundFile.get_length()
 var winRoundName: String = "WinRound"
 
 var loseRoundFile: Resource = preload("res://Music/LoseRound.wav")
